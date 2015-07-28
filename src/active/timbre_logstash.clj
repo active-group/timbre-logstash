@@ -27,14 +27,13 @@
 (defn data->json-string
   [data]
   (cheshire/generate-string
-   (merge (dissoc data
-                  :config :appender-id :appender 
-                  :instant
-                  :?err_ :vargs_ :hostname_ :msg_ :timestamp_ :output-fn 
-                  :profile-stats
-                  :data-hash-fn :msg-fn)
-          { ;; we keep :level :error-level? :?ns-str :?file :?line
-           :throwable (some-> (:throwable data) timbre/stacktrace)
+   (merge (:context data)
+          {:throwable (some-> (:throwable data) timbre/stacktrace)
+           :level (:level data)
+           :error-level? (:error-level? data)
+           :?ns-str (:?ns-str data)
+           :?file (:?file data)
+           :?line (:?line data)
            :err (str (force (:?err_ data)))
            :vargs (force (:vargs_ data))
            :hostname (force (:hostname_ data))
