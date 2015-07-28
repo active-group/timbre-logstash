@@ -1,4 +1,4 @@
-(defproject timbre-logstash "0.1.0-SNAPSHOT"
+(defproject timbre-logstash "0.1.0"
   :description "timbre-logstash: Send Timbre output to logstash"
   :url "http://github.com/active-group/timbre-logstash"
   :license {:name "Eclipse Public License"
