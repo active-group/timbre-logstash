@@ -12,7 +12,7 @@
 (defn connect
   [host port]
   (let [addr (InetAddress/getByName host)
-        sock (Socket. addr port)]
+        sock (Socket. addr (int port))]
     [sock
      (PrintWriter. (.getOutputStream sock))]))
 
