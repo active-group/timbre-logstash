@@ -51,10 +51,13 @@
      :output-fn  :inherit
      :fn
      (fn [data]
-       (let [[sock out] (swap! conn
-                                (fn [conn]
-                                  (or (and conn (connection-ok? conn) conn)
-                                      (connect host port))))
-             json (data->json-string data)]
-         (binding [*out* out]
-           (println json))))}))
+       (try
+         (let [[sock out] (swap! conn
+                                 (fn [conn]
+                                   (or (and conn (connection-ok? conn) conn)
+                                       (connect host port))))
+               json (data->json-string data)]
+           (binding [*out* out]
+             (println json)))
+         (catch java.io.IOException _
+           nil)))}))
