@@ -10,7 +10,6 @@
    :appender {:baz :bla}
    :instant :foo
    :level :warning
-   :error-level? :fatal
    :?ns-str "ns"
    :?file nil
    :?line 15

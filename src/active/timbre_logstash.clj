@@ -30,7 +30,6 @@
   (cheshire/generate-string
    (merge (:context data)
           {:level (:level data)
-           :error-level? (:error-level? data)
            :?ns-str (:?ns-str data)
            :?file (:?file data)
            :?line (:?line data)
