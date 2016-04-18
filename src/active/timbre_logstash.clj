@@ -22,10 +22,10 @@
 
 (def iso-format "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
-(defn data->json-string
-  [data]
+(defn data->json-stream
+  [data writer]
   ;; Note: this it meant to target the logstash-filter-json; especially "message" and "@timestamp" get a special meaning there.
-  (cheshire/generate-string
+  (cheshire/generate-stream
    (merge (:context data)
           {:level (:level data)
            :?ns-str (:?ns-str data)
@@ -35,13 +35,15 @@
            :hostname (force (:hostname_ data))
            :message (force (:msg_ data))
            "@timestamp" (:instant data)})
+   writer
    {:date-format iso-format
     :pretty false}))
 
 (defn timbre-json-appender
   "Returns a Logstash appender."
   [host port]
-  (let [conn (atom nil)]
+  (let [conn (atom nil)
+        nl "\n"]
     {:enabled?   true
      :async?     false
      :min-level  nil
@@ -53,9 +55,9 @@
          (let [[sock out] (swap! conn
                                  (fn [conn]
                                    (or (and conn (connection-ok? conn) conn)
-                                       (connect host port))))
-               json (data->json-string data)]
-           (binding [*out* out]
-             (println json)))
+                                       (connect host port))))]
+           (data->json-stream data out)
+           ;; logstash tcp input plugin: "each event is assumed to be one line of text".
+           (.write ^java.io.Writer out nl))
          (catch java.io.IOException _
            nil)))}))
