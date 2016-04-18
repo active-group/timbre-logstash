@@ -15,7 +15,6 @@
    :?file nil
    :?line 15
    :?err_ (delay (Exception. "foo"))
-   :vargs_ (delay ["a" :b 15])
    :hostname_ (delay "hostname")
    :msg_ (delay "msg")
    :timestamp_ (delay "2015-07-17T09:01:45.539Z")

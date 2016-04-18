@@ -34,7 +34,6 @@
            :?ns-str (:?ns-str data)
            :?file (:?file data)
            :?line (:?line data)
-           :vargs (force (:vargs_ data))
            :err (some-> (force (:?err_ data)) timbre/stacktrace)
            :hostname (force (:hostname_ data))
            :message (force (:msg_ data))
