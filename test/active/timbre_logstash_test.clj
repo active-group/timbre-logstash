@@ -9,13 +9,12 @@
    :appender-id "foo"
    :appender {:baz :bla}
    :instant :foo
-   :throwable nil
    :level :warning
    :error-level? :fatal
    :?ns-str "ns"
    :?file nil
    :?line 15
-   :?err_ (delay "foo")
+   :?err_ (delay (Exception. "foo"))
    :vargs_ (delay ["a" :b 15])
    :hostname_ (delay "hostname")
    :msg_ (delay "msg")

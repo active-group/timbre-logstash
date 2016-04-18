@@ -28,14 +28,13 @@
   [data]
   (cheshire/generate-string
    (merge (:context data)
-          {:throwable (some-> (:throwable data) timbre/stacktrace)
-           :level (:level data)
+          {:level (:level data)
            :error-level? (:error-level? data)
            :?ns-str (:?ns-str data)
            :?file (:?file data)
            :?line (:?line data)
-           :err (str (force (:?err_ data)))
            :vargs (force (:vargs_ data))
+           :err (some-> (force (:?err_ data)) timbre/stacktrace)
            :hostname (force (:hostname_ data))
            :msg (force (:msg_ data))
            :timestamp (time-format/unparse iso-formatter (time-coerce/from-date (:instant data)))})))
