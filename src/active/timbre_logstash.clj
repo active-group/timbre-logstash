@@ -22,10 +22,11 @@
        (.isConnected sock)
        (not (.checkError out))))
 
-(def iso-formatter (time-format/formatters :basic-date-time))
+(def iso-formatter (time-format/formatters :date-time))
 
 (defn data->json-string
   [data]
+  ;; Note: this it meant to target the logstash-filter-json; especially "message" and "@timestamp" get a special meaning there.
   (cheshire/generate-string
    (merge (:context data)
           {:level (:level data)
@@ -36,8 +37,8 @@
            :vargs (force (:vargs_ data))
            :err (some-> (force (:?err_ data)) timbre/stacktrace)
            :hostname (force (:hostname_ data))
-           :msg (force (:msg_ data))
-           :timestamp (time-format/unparse iso-formatter (time-coerce/from-date (:instant data)))})))
+           :message (force (:msg_ data))
+           "@timestamp" (time-format/unparse iso-formatter (time-coerce/from-date (:instant data)))})))
 
 (defn timbre-json-appender
   "Returns a Logstash appender."
