@@ -1,9 +1,7 @@
 (ns active.timbre-logstash
   "Timbre appenders that send output to logstash."
   (:require [taoensso.timbre :as timbre]
-            [cheshire.core :as cheshire]
-            [clj-time.coerce :as time-coerce]
-            [clj-time.format :as time-format])
+            [cheshire.core :as cheshire])
   (:import  [java.net Socket InetAddress]
             [java.io PrintWriter]))
 
@@ -22,7 +20,7 @@
        (.isConnected sock)
        (not (.checkError out))))
 
-(def iso-formatter (time-format/formatters :date-time))
+(def iso-format "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
 (defn data->json-string
   [data]
@@ -36,7 +34,9 @@
            :err (some-> (force (:?err_ data)) timbre/stacktrace)
            :hostname (force (:hostname_ data))
            :message (force (:msg_ data))
-           "@timestamp" (time-format/unparse iso-formatter (time-coerce/from-date (:instant data)))})))
+           "@timestamp" (:instant data)})
+   {:date-format iso-format
+    :pretty false}))
 
 (defn timbre-json-appender
   "Returns a Logstash appender."
