@@ -23,25 +23,27 @@
 (def iso-format "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
 (defn data->json-stream
-  [data writer]
+  [data writer opts]
   ;; Note: this it meant to target the logstash-filter-json; especially "message" and "@timestamp" get a special meaning there.
-  (cheshire/generate-stream
-   (merge (:context data)
-          {:level (:level data)
-           :?ns-str (:?ns-str data)
-           :?file (:?file data)
-           :?line (:?line data)
-           :err (some-> (force (:?err_ data)) timbre/stacktrace)
-           :hostname (force (:hostname_ data))
-           :message (force (:msg_ data))
-           "@timestamp" (:instant data)})
-   writer
-   {:date-format iso-format
-    :pretty false}))
+  (let [pr-stacktrace (or (:pr-stacktrace opts) timbre/stacktrace)]
+    (cheshire/generate-stream
+     (merge (:context data)
+            {:level (:level data)
+             :?ns-str (:?ns-str data)
+             :?file (:?file data)
+             :?line (:?line data)
+             :err (some-> (force (:?err_ data)) (pr-stacktrace))
+             :hostname (force (:hostname_ data))
+             :message (force (:msg_ data))
+             "@timestamp" (:instant data)})
+     writer
+     (merge {:date-format iso-format
+             :pretty false}
+            opts))))
 
 (defn timbre-json-appender
   "Returns a Logstash appender."
-  [host port]
+  [host port & [opts]]
   (let [conn (atom nil)
         nl "\n"]
     {:enabled?   true
@@ -56,7 +58,7 @@
                                  (fn [conn]
                                    (or (and conn (connection-ok? conn) conn)
                                        (connect host port))))]
-           (data->json-stream data out)
+           (data->json-stream data out (select-keys opts [:pr-stacktrace]))
            ;; logstash tcp input plugin: "each event is assumed to be one line of text".
            (.write ^java.io.Writer out nl))
          (catch java.io.IOException _
