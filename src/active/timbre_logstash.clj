@@ -60,8 +60,9 @@
                                  (fn [conn]
                                    (or (and conn (connection-ok? conn) conn)
                                        (connect host port))))]
-           (data->json-stream data out (select-keys opts [:pr-stacktrace]))
-           ;; logstash tcp input plugin: "each event is assumed to be one line of text".
-           (.write ^java.io.Writer out nl))
+           (locking sock
+             (data->json-stream data out (select-keys opts [:pr-stacktrace]))
+             ;; logstash tcp input plugin: "each event is assumed to be one line of text".
+             (.write ^java.io.Writer out nl)))
          (catch java.io.IOException _
            nil)))}))
