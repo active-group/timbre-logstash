@@ -25,14 +25,16 @@
 (defn data->json-stream
   [data writer opts]
   ;; Note: this it meant to target the logstash-filter-json; especially "message" and "@timestamp" get a special meaning there.
-  (let [pr-stacktrace (or (:pr-stacktrace opts) timbre/stacktrace)]
+  (let [stacktrace-str (if-let [pr (:pr-stacktrace opts)]
+                         #(with-out-str (pr %))
+                         timbre/stacktrace)]
     (cheshire/generate-stream
      (merge (:context data)
             {:level (:level data)
              :?ns-str (:?ns-str data)
              :?file (:?file data)
              :?line (:?line data)
-             :err (some-> (force (:?err_ data)) (pr-stacktrace))
+             :err (some-> (force (:?err_ data)) (stacktrace-str))
              :hostname (force (:hostname_ data))
              :message (force (:msg_ data))
              "@timestamp" (:instant data)})
