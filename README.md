@@ -2,6 +2,10 @@
 
 Send [Timbre](https://github.com/ptaoussanis/timbre) output to [Logstash](https://www.elastic.co/products/logstash).
 
+## DEPRECATED
+
+This has been merged into [Timbre](https://github.com/ptaoussanis/timbre) as a 3rd party appender.
+
 ## Usage
 
 The function `timbre-json-appender` returns a Timbre appender, which
